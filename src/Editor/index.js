@@ -1,10 +1,27 @@
-import React, { useState } from "react";
-import { Editor, EditorState, RichUtils } from "draft-js";
+import React, { useEffect, useState } from "react";
+import { Editor, EditorState, RichUtils, convertFromRaw, convertToRaw } from "draft-js";
 import "draft-js/dist/Draft.css";
 import "./index.css";
 
 const MyEditor = () => {
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
+
+
+  useEffect(() => {
+    const savedContent = localStorage.getItem('editorContent');
+    if (savedContent) {
+      const contentState = convertFromRaw(JSON.parse(savedContent));
+      setEditorState(EditorState.createWithContent(contentState));
+    }
+  }, []);
+
+
+  const handleSave = () => {
+    const contentState = editorState.getCurrentContent();
+    const contentStateJSON = convertToRaw(contentState);
+    localStorage.setItem('editorContent', JSON.stringify(contentStateJSON));
+  };
+
   const customStyleMap = {
     BOLD: {
       fontWeight: "bold",
@@ -84,7 +101,7 @@ const MyEditor = () => {
     <>
       <div className="heading-container">
         <span className="heading">Demo Editor by Sai Prasoon</span>
-        <button variant="contained" className="save-button" id="saveButton">
+        <button variant="contained" className="save-button" id="saveButton" onClick={handleSave}>
           Save
         </button>
       </div>
